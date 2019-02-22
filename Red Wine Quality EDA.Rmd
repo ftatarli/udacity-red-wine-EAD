@@ -1,0 +1,267 @@
+---
+title: "Red Wine Quality: Exploratory Data Analysis"
+author: "by Filipe Tatarli"
+#date: "21/02/2019"
+output: html_document
+---
+
+* * *
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+  
+  All the packages used in the analysis are listed below:
+```{r Libraries, include=TRUE}
+library(ggplot2)
+library(gridExtra)
+```
+
+```{r Data Preparation, include=FALSE}
+wine.red <- read.csv('/Users/filipetatarli/Documents/R_Projects/data/wineQualityReds.csv')
+```
+
+# Univariate Plots Section  
+  
+  Our dataset consists of 13 variables, with 1.599 observations.  
+
+```{r Data structure analysis, echo=FALSE}
+str(wine.red)
+```
+
+```{r Data summary, echo=FALSE}
+summary(wine.red)
+```
+
+```{r Create Quality Text, echo=FALSE}
+wine.red$quality.cat <- NA
+wine.red$quality.cat <- ifelse(wine.red$quality >= 7, 'good', NA)
+wine.red$quality.cat <- ifelse(wine.red$quality == 5, 'medium', wine.red$quality.cat)
+wine.red$quality.cat <- ifelse(wine.red$quality == 6, 'medium', wine.red$quality.cat)
+wine.red$quality.cat <- ifelse(wine.red$quality <= 4, 'bad', wine.red$quality.cat)
+wine.red$quality.cat <- factor(wine.red$quality.cat, levels = c("bad", "medium", "good"))
+```
+
+# Univariate Analysis  
+  
+  First of all I checked the distribution of the quality variable of the dataset where I noticed that most rated quality of red wines data are between 5 and 6. Besides that the assigned ratings range from 3 to 8.  
+    
+  
+```{r Histogram of Wine Quality, echo=FALSE}
+ggplot(aes(x = quality), data = wine.red) +
+  geom_histogram(binwidth = 1, color = 'black', fill = '#F79420') +
+  scale_x_continuous(breaks = seq(1,8,1)) +
+  xlab('Quality') + 
+  ylab('Count') +
+  ggtitle('Histogram of Wine Quality')
+  
+table(wine.red$quality)
+```
+  
+  Now I want to explore other attributes and understand if the variables appear in an normal distribution.  
+    
+    
+```{r Univariate Analysis Graphs, echo=FALSE, warning=FALSE, message=FALSE}
+p1 <- ggplot(aes(x = fixed.acidity), data = wine.red) +
+  geom_histogram() +
+  scale_x_continuous(limits = c(4, 16)) +
+  ggtitle('Histogram of Fixed Acidity')
+
+p1_log <- ggplot(aes(x = log(fixed.acidity)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of Fixed Acidity - Log')
+
+p2 <- ggplot(aes(x = volatile.acidity), data = wine.red) +
+  geom_histogram() +
+  scale_x_continuous(limits = c(0, 2)) +
+  ggtitle('Histogram of Volatile Acidity')
+
+p2_log <- ggplot(aes(x = log(volatile.acidity)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of Volatile Acidity - Log')
+
+p3 <- ggplot(aes(x = citric.acid), data = wine.red) +
+  geom_histogram() +
+  scale_x_continuous(limits = c(0, 1)) +
+  ggtitle('Histogram of Citric Acid')
+
+p3_log <- ggplot(aes(x = log(citric.acid)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of Citric Acid - Log')
+
+p4 <- ggplot(aes(x = residual.sugar), data = wine.red) +
+  geom_histogram() +
+  scale_x_continuous(limits = c(0, 16)) +
+  ggtitle('Histogram of Residual Sugar')
+
+p4_log <- ggplot(aes(x = log(residual.sugar)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of Residual Sugar - Log')
+
+p5 <- ggplot(aes(x = chlorides), data = wine.red) +
+  geom_histogram() +
+  scale_x_continuous(limits = c(0, 1)) +
+  ggtitle('Histogram of Chlorides')
+
+p5_log <- ggplot(aes(x = log(chlorides)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of Chlorides - Log')
+
+p6 <- ggplot(aes(x = free.sulfur.dioxide), data = wine.red) +
+  geom_histogram() +
+  scale_x_continuous(limits = c(1, 72)) +
+  ggtitle('Histogram of Free Sulfur Dioxide')
+
+p6_log <- ggplot(aes(x = log(free.sulfur.dioxide)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of Free Sulfur Dioxide - Log')
+
+p7 <- ggplot(aes(x = total.sulfur.dioxide), data = wine.red) +
+  geom_histogram() +
+  scale_x_continuous(limits = c(6, 289)) +
+  ggtitle('Histogram of Total Sulfur Dioxide')
+
+p7_log <- ggplot(aes(x = log(total.sulfur.dioxide)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of Total Sulfur Dioxide - Log')
+
+p8 <- ggplot(aes(x = density), data = wine.red) +
+  scale_x_continuous(limits = c(0, 1)) +
+  geom_histogram() +
+  ggtitle('Histogram of Density')
+
+p8_log <- ggplot(aes(x = log(density)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of Density - Log')
+
+p9 <- ggplot(aes(x = pH), data = wine.red) +
+  scale_x_continuous(limits = c(2, 4)) +
+  geom_histogram() +
+  ggtitle('Histogram of pH')
+
+p9_log <- ggplot(aes(x = log(pH)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of pH - Log')
+
+p10 <- ggplot(aes(x = sulphates), data = wine.red) +
+  scale_x_continuous(limits = c(0, 2)) +
+  geom_histogram() +
+  ggtitle('Histogram of Sulphates')
+
+p10_log <- ggplot(aes(x = log(sulphates)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of Sulphates - Log')
+
+p11 <- ggplot(aes(x = alcohol), data = wine.red) +
+  scale_x_continuous(limits = c(8, 15)) +
+  geom_histogram() +
+  ggtitle('Histogram of Alcohol')
+
+p11_log <- ggplot(aes(x = log(alcohol)), data = wine.red) +
+  geom_histogram() +
+  ggtitle('Histogram of Alcohol - Log')
+
+grid.arrange(p1,  p1_log, ncol = 2)
+grid.arrange(p2,  p2_log, ncol = 2)
+grid.arrange(p3,  p3_log, ncol = 2)
+grid.arrange(p4,  p4_log, ncol = 2)
+grid.arrange(p5,  p5_log, ncol = 2)
+grid.arrange(p6,  p6_log, ncol = 2)
+grid.arrange(p7,  p7_log, ncol = 2)
+  
+```
+  
+    
+      
+        
+  
+#### What is the structure of your dataset?
+  
+  The dataset had __1599 observations__ with __13 features__ (fixed.acidity, volatile.acidity, citric.acid, residual.sugar, chlorides, free.sulfur.dioxide, total.sulfur.dioxide, density, pH, sulphates, alcohol and quality).
+  
+  
+#### What is/are the main feature(s) of interest in your dataset?  
+  
+  The main feature of interest is the quality of the wine.  
+  
+  
+#### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
+  
+  RESPOSTA AQUI.  
+    
+
+#### Did you create any new variables from existing variables in the dataset?
+  
+  I created a discrete variable for the quality where:
+  
+* bad (<=4)
+* medium (5 or 6)
+* good ( >= 7)
+  
+  
+#### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?  
+  
+  Most of the features had a normal distribution like density and pH with few outliers.  
+Some features such as Residual Sugar and Chlorides show long tails what indicates the presence of outliers. 
+
+# Bivariate Plots Section
+
+# Bivariate Analysis
+
+#### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
+
+#### Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
+
+#### What was the strongest relationship you found?
+
+# Multivariate Plots Section
+
+# Multivariate Analysis
+
+#### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
+
+#### Were there any interesting or surprising interactions between features?
+
+* * * 
+
+# Final Plots and Summary
+
+# # Plot One
+
+# # Description One
+
+# # Plot Two
+
+# # Description Two
+
+# # Plot Three
+
+# # Description Three
+
+* * *
+
+# Reflection
+
+
+
+fixed acidity is correlated to citric acid, density and pH.
+volatile acidity is correlated to citric acid and sulphates.
+citric acid is correlated to volatile, fixed acidity, pH and sulphates.
+chlorides is correlated to density and sulphates.
+density is correlated to fixed acidity, alcohol, residual sugar and chlorides.
+pH is correlated to fixed acidity and citric acid.
+sulphates is correlated to volatile acidity, citric acid and chlorides.
+residual sugar is correlated to density.
+alcohol is correlated to density.
+
+The first one the boxplot graph between alcohol and quality which shows how quality is affected by alcohol precentage.
+the highest quality level has mean near to 12% alcohol, and the lowest quality level has a mean near to 10% of alcohol .
+And if we considered the 2% difference to not be big, the graph show the opposite, as the alcohol level goes higher from 10 to 12 the quality level goes higher.
+
+
+The white wine data set contains information on 4898 white wines. At first place, I even don't know how to start because I know nothing about wines. So I decide to read the introduction file of the dataset to read the text that explain each single variable. Then I have the initial sense about white wines and I expect there might exist some trend of wines' quality before seeing into the data. (For example, I think more citric acid produce better wine because in the data description it tells that citric acid can add 'freshness' and flavor to wines).
+
+After, I started by understanding the individual variables in the data set. Then I explored the interaction of every attribute with wine quality. I plot a lot of boxplots to detect the trends but I struggled wondering why the trends usually weird, especially the wines with quality 3 and quality 9. Then I just realized that I treat the data with the same quality prior information, however, wines with quality 3 and nine account for small portion of the whole dataset. They sometimes act like outliers to noise the trends. Therefore I decide to focus on the wines with quality 4,5,6,7,8. Fortunately, I find some certain trends. (For example, a better wine should have more alcohols content). Finally I use decision tree to verify my discovery successfully. Before doing this project, I usually wonder why we need EDA, why we don't directly use machine learning algorithm like feature selection, regression…etc to answer the question.
+
+However, after doing this project, I realize EDA can enhance our understanding of the data while learning algorithm sometimes just tell us that a feature is important because it optimize certain cost function. Through EDA, we can discover more interesting latent pattern and create more possibilites of the data. In this project, I didn't use learninng algorithm to predicte the quality of white wine. I think the future work will be applying EDA to improve the learning algorithm.
