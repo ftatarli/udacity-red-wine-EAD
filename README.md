@@ -10,7 +10,5 @@ Exploring the red wine dataset by using a variety of plots.
 
 Table of Contents
 
-- .html 
-- .rmd
-- .txt
-- .csv
+- Red_Wine_Quality_EDA.html
+- Red Wine Quality EDA.rmd

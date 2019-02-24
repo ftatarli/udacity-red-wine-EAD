@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r Libraries, include=TRUE}
 library(ggplot2)
 library(gridExtra)
+library(ggcorrplot)
 ```
 
 ```{r Data Preparation, include=FALSE}
@@ -172,10 +173,6 @@ grid.arrange(p7,  p7_log, ncol = 2)
   
 ```
   
-    
-      
-        
-  
 #### What is the structure of your dataset?
   
   The dataset had __1599 observations__ with __13 features__ (fixed.acidity, volatile.acidity, citric.acid, residual.sugar, chlorides, free.sulfur.dioxide, total.sulfur.dioxide, density, pH, sulphates, alcohol and quality).
@@ -188,12 +185,11 @@ grid.arrange(p7,  p7_log, ncol = 2)
   
 #### What other features in the dataset do you think will help support your investigation into your feature(s) of interest?
   
-  RESPOSTA AQUI.  
-    
+  In univariate analysis, it is hard to find an variable that are related to quality.
 
 #### Did you create any new variables from existing variables in the dataset?
   
-  I created a discrete variable for the quality where:
+  I created a variable for rating the wine quality, where:
   
 * bad (<=4)
 * medium (5 or 6)
@@ -203,65 +199,120 @@ grid.arrange(p7,  p7_log, ncol = 2)
 #### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?  
   
   Most of the features had a normal distribution like density and pH with few outliers.  
-Some features such as Residual Sugar and Chlorides show long tails what indicates the presence of outliers. 
+Some features such as residual sugar and chlorides showed long tails what indicates the presence of outliers. 
 
 # Bivariate Plots Section
 
 # Bivariate Analysis
 
-#### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
+```{r Correlation, echo=FALSE}
+corr <- round(cor(wine.red[, 2:13]),3)
+
+ggcorrplot(corr, hc.order = TRUE, outline.col = "white", type = "lower", lab = TRUE, tl.cex = 7, digits = 1, tl.srt = 90)
+```
+
+#### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?  
+  
+  The variables alcohol and volatile acidity, have strong correlation with the quality. ( ___0.476___ and ___-0.391___)
 
 #### Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
 
+  The variables fixed acidity and pH had a stronger negative correlation than others.
+
 #### What was the strongest relationship you found?
+  
+  The strongest relationship was found betwenn fixed acidity and citric acid (r = ___0.672___).
 
 # Multivariate Plots Section
 
 # Multivariate Analysis
+  
+  Now we discovered that alchohol and quality has a considerable correlation (r = 0.476). We will investiguet other variables that can impact the quality. 
+
+```{r Multivariate Plots v1, echo=FALSE}
+ggplot(wine.red, aes(x = alcohol, y = volatile.acidity, color = quality)) +
+  geom_jitter() +
+  scale_color_gradient(high = 'green', low = 'red')
+
+ggplot(wine.red, aes(x = alcohol, y = residual.sugar, color = quality)) +
+  geom_jitter() +
+  scale_color_gradient(high = 'green', low = 'red')
+
+ggplot(wine.red, aes(x = alcohol, y = density, color = quality)) +
+  geom_jitter() +
+  scale_color_gradient(high = 'green', low = 'red')
+```
 
 #### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
-
+  
+  I didn't find a strong relationship between the variables. I only observated that when the alcohol increases and the volitile acidity decreases we note that the wine quality increases.
+  
 #### Were there any interesting or surprising interactions between features?
+
+  No
 
 * * * 
 
 # Final Plots and Summary
 
-# # Plot One
+### Plot One
 
-# # Description One
+```{r Plots One, echo = FALSE}
+ggplot(data = wine.red
+       ,aes(x = quality.cat, y = alcohol, fill = quality.cat)) +
+  geom_boxplot(show.legend = FALSE) +
+  stat_summary(fun.y = mean, geom = 'point', shape = 4, show.legend = FALSE) +
+  labs(title = "% ALCOHOL BY WINE QUALITY"
+       ,x = "Quality"
+       ,y = "% Alcohol")
 
-# # Plot Two
+by(wine.red$alcohol, wine.red$quality.cat, summary)
+```
 
-# # Description Two
+### Description One
+  
+  The boxplot shows how quality is affected by alcohol percentage. When higher the median better the quality. Besides that the medium quality has a lot of outliers. 
 
-# # Plot Three
+### Plot Two
 
-# # Description Three
+```{r Plots Two, echo=FALSE}
+ggplot(data = wine.red
+       , aes(x = alcohol, y = quality)) +
+  geom_jitter(alpha = 0.3, height = 0.5, width = 0.025) +
+  geom_smooth(method = "lm") +
+  scale_y_continuous(limits = c(4,8)) +
+  ggtitle("Quality vs Alcohol") +
+  xlab("Alcohol(%)") +
+  ylab("Quality")
+```
 
+
+### Description Two
+  
+  In this plot we confirmed that when alcohol increases the quality of the wine increases too.
+
+### Plot Three
+
+```{r Plots Three, echo=FALSE}
+ggplot(data = wine.red, aes(x = alcohol, y = density, color = factor(quality))) +
+  geom_jitter() + # alpha
+  ggtitle("Quality by Volitile Acidity and Alcohol") +
+  xlab("Alcohol (%)") +
+  ylab("Volitile Acidity (g/L)")
+
+```
+
+
+### Description Three  
+  
+  This graph shows the few values of better quality (8). Altought revels that que quality improves as the alcohol increases and the volitile decreases (red points).
+  
 * * *
 
-# Reflection
+# Reflection  
+  
+  In this data, my main struggle was to undestand the correlation between variables. I know nothing about wines. So I decide to understand each variable independent and then start building random graphs to understand the dataset.  
+  I explored the interaction of every attribute with wine quality. I plot a lot of boxplots to detect the trends. 
+  The plots and graphs make it easier to see where to explore more.  
+  For future work, I intend on implement a predictive model with some statistical techniques like regression.
 
-
-
-fixed acidity is correlated to citric acid, density and pH.
-volatile acidity is correlated to citric acid and sulphates.
-citric acid is correlated to volatile, fixed acidity, pH and sulphates.
-chlorides is correlated to density and sulphates.
-density is correlated to fixed acidity, alcohol, residual sugar and chlorides.
-pH is correlated to fixed acidity and citric acid.
-sulphates is correlated to volatile acidity, citric acid and chlorides.
-residual sugar is correlated to density.
-alcohol is correlated to density.
-
-The first one the boxplot graph between alcohol and quality which shows how quality is affected by alcohol precentage.
-the highest quality level has mean near to 12% alcohol, and the lowest quality level has a mean near to 10% of alcohol .
-And if we considered the 2% difference to not be big, the graph show the opposite, as the alcohol level goes higher from 10 to 12 the quality level goes higher.
-
-
-The white wine data set contains information on 4898 white wines. At first place, I even don't know how to start because I know nothing about wines. So I decide to read the introduction file of the dataset to read the text that explain each single variable. Then I have the initial sense about white wines and I expect there might exist some trend of wines' quality before seeing into the data. (For example, I think more citric acid produce better wine because in the data description it tells that citric acid can add 'freshness' and flavor to wines).
-
-After, I started by understanding the individual variables in the data set. Then I explored the interaction of every attribute with wine quality. I plot a lot of boxplots to detect the trends but I struggled wondering why the trends usually weird, especially the wines with quality 3 and quality 9. Then I just realized that I treat the data with the same quality prior information, however, wines with quality 3 and nine account for small portion of the whole dataset. They sometimes act like outliers to noise the trends. Therefore I decide to focus on the wines with quality 4,5,6,7,8. Fortunately, I find some certain trends. (For example, a better wine should have more alcohols content). Finally I use decision tree to verify my discovery successfully. Before doing this project, I usually wonder why we need EDA, why we don't directly use machine learning algorithm like feature selection, regression…etc to answer the question.
-
-However, after doing this project, I realize EDA can enhance our understanding of the data while learning algorithm sometimes just tell us that a feature is important because it optimize certain cost function. Through EDA, we can discover more interesting latent pattern and create more possibilites of the data. In this project, I didn't use learninng algorithm to predicte the quality of white wine. I think the future work will be applying EDA to improve the learning algorithm.
